@@ -1,9 +1,11 @@
+# 모든 사용자 CRUD
 type PublicPost @model {
   id: ID!
   title: String!
   content: String
 }
 
+# 인증된 사용자 본인만 CRUD
 type PrivatePost @model @auth(rules: [{ allow: owner }]) {
   id: ID!
   title: String!
@@ -26,3 +28,13 @@ type PrivatePost @model @auth(rules: [{ allow: owner }]) {
 #  title: String!
 #  content: String
 #}
+
+# 인증된 사용자 CRUD
+# 나머지 모든 사용자 Read
+type Post
+  @model
+  @auth(rules: [{ allow: public, operations: [read] }, { allow: owner }]) {
+  id: ID!
+  title: String!
+  content: String
+}

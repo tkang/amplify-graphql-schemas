@@ -476,7 +476,7 @@ query MyQuery {
 }
 ```
 
-## Private API Access
+## Private Post : 인증된 사용자 본인만 CRUD 가능한 모델
 
 인증된 사용자만 액세스 할수 있는 API 와 모델인 PrivatePost 을 만들어봅시다.
 
@@ -557,3 +557,71 @@ query MyQuery {
 ```
 
 > 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 인증된 사용자만 조회(read) 가능하기 때문입니다.
+
+## Post : 인증된 사용자는 CRUD 가능 + 다른 사용자들 (인증/비인증) 은 Read 가능
+
+인증된 사용자는 생성/수정/삭제/읽기 가능하고, 다른 사용자들은 읽기만 가능한 Post 를 만들어봅시다.
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type Post
+  @model
+  @auth(rules: [{ allow: public, operations: [read] }, { allow: owner }]) {
+  id: ID!
+  title: String!
+  content: String
+}
+```
+
+- `allow: public, operations: [read]` 를 `allow: private, operations: [read]` 으로 바꾸면 인증된 사용자들만 글을 읽을수 있게 됩니다. (인증 안된 사용자는 unauthorized error)
+- `allow: owner` 를 `allow: private` 으로 바꾸면, 인증된 사용자들이 글을 수정/삭제 가능하게 됩니다.
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
+### Testing API : Post
+
+AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 Post 를 생성합니다.
+
+"Select the authorization provider to use for running queries on this page" 는 `Amazon Cognito User Pools` 로 선택하고 이전 과정에서 생성한 계정으로 로그인해서 인증을 해주세요.
+
+```graphql
+mutation MyMutation {
+  createPost(
+    input: {
+      title: "1st regular post readbale by public"
+      content: "content readable by public"
+    }
+  ) {
+    createdAt
+    content
+    id
+    owner
+    title
+    updatedAt
+  }
+}
+```
+
+> 이번에도 역시 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 나며 레코드 생성에 실패합니다. Post 는 인증된 사용자만 생성(create) 가능하기 때문입니다.
+
+Post 목록을 쿼리해봅니다. 인증방식을 `API Key` 로 변경하고 실행해도 잘 조회되어야 합니다.
+
+```graphql
+query MyQuery {
+  listPosts {
+    items {
+      createdAt
+      content
+      id
+      owner
+      title
+      updatedAt
+    }
+  }
+}
+```

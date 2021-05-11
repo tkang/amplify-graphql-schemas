@@ -379,3 +379,99 @@ SignOut 버튼을 눌러서 로그아웃이 잘 되는지도 확인해보세요.
 ```
 
 브라우져 콘솔을 열고 / 페이지를 로딩하면, 콘솔에 로그인된 사용자 정보들과 attributes 들이 출력되는걸 확인할수 있습니다.
+
+## Adding an AWS AppSync GraphQL API
+
+GraphQL API 를 추가하기 위해선, 다음 명령어를 실행합니다.
+일단 api key 를 가지고 있는 클라이언트들은 접근할수 있는 public api 로 만들겠습니다.
+
+```sh
+$ amplify add api
+
+? Please select from one of the below mentioned services: GraphQL
+? Provide API name: amplifygraphqlschema
+? Choose the default authorization type for the API API key
+? Enter a description for the API key:
+? After how many days from now the API key should expire (1-365): 365
+? Do you want to configure advanced settings for the GraphQL API Yes, I want to make some additional changes.
+? Configure additional auth types? Yes
+? Choose the additional authorization types you want to configure for the API Amazon Cognito User Pool
+Cognito UserPool configuration
+Use a Cognito user pool configured as a part of this project.
+? Enable conflict detection? No
+? Do you have an annotated GraphQL schema? No
+? Choose a schema template: Single object with fields (e.g., “Todo” with ID, name, description)
+? Do you want to edit the schema now? (Y/n) Y
+```
+
+실행된 CLI 는 GraphQL schema 를 텍스트 에디터로 수정할수 있게 로딩됩니다.
+
+> 기본 인증 방식은 API Key 이며 optional 인증 방식은 Cognito UserPool (로그인 사용자) 입니다.
+
+> 클라이언트에서 API 호출시 어떤 인증방식을 사용할 것인지 파리미터로 지정해줘야 합니다. 아래 부분에서 보여드리도록 하겠습니다.
+
+### PublicPost : 모든 사용자가 CRUD 가능한 모델 추가
+
+일단 모든 사용자가 CRUD 액세스 할수 있는 모델로 만들어보겠습니다. PublicPost 라고 하겠습니다.
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 schema 내용을 다음과 같이 바꿔봅시다.
+
+```graphql
+type PublicPost @model {
+  id: ID!
+  title: String!
+  content: String
+}
+```
+
+변경 사항 적용을 위해 `amplify push` 명령어를 실행합니다.
+
+```sh
+$ amplify push
+
+? Are you sure you want to continue? Yes
+```
+
+### Testing API : PublicPost
+
+AppSync dashboard 내 GraphQL editor 로 들어가면, API 를 테스트 할수 있습니다. AppSync dashboard 를 오픈하려면, 다음 명령어를 실행합니다.
+
+```sh
+$ amplify console api
+
+> Choose GraphQL
+```
+
+AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 PublicPost을 생성합니다.
+
+비인증 사용자가 생성할수 있는지를 테스트 해보는것이기 때문에 "Select the authorization provider to use for running queries on this page" 는 `API Key` 로 선택합니다.
+
+```graphql
+mutation MyMutation {
+  createPublicPost(
+    input: { title: "1st post", content: "content for 1st post" }
+  ) {
+    createdAt
+    content
+    id
+    title
+    updatedAt
+  }
+}
+```
+
+PublicPost 목록을 쿼리해봅니다.
+
+```graphql
+query MyQuery {
+  listPublicPosts {
+    items {
+      createdAt
+      content
+      id
+      title
+      updatedAt
+    }
+  }
+}
+```

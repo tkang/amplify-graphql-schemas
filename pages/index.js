@@ -1,6 +1,19 @@
 import Head from "next/head";
+import { withAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
+import { useEffect } from "react";
+import { Auth } from "aws-amplify";
 
 function Home() {
+  useEffect(() => {
+    checkUser(); // new function call
+  });
+
+  async function checkUser() {
+    const user = await Auth.currentAuthenticatedUser();
+    console.log("user: ", user);
+    console.log("user attributes: ", user.attributes);
+  }
+
   return (
     <div>
       <Head>
@@ -17,6 +30,7 @@ function Home() {
 
           <p className="text-2xl">Common GraphQL Schemas in Amplify</p>
         </main>
+        <AmplifySignOut />
       </div>
 
       <footer className="flex items-center justify-center h-8 border-t-1">
@@ -26,4 +40,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default withAuthenticator(Home);

@@ -254,3 +254,128 @@ $ amplify publish
 ```
 
 배포가 완료되면, 브라우져에서 터미널에 출력된 url 로 들어가보셔서 next.js 앱이 정상적으로 로딩되는 것을 확인해주세요.
+
+### Configuring the React applicaion
+
+API 가 생성되고 준비되었으니, app 을 통해 테스트 해봅시다.
+
+우선 해야할일은, 우리가 만들고 있는 app 에서 Amplify project 에 대해 인식하도록 설정하는 것입니다. src 폴더 안에 자동생성된 `aws-exports.js` 파일을 참조하도록 추가해봅시다.
+
+설정을 하기위해 **pages/\_app.js** 파일을 열고, 다음 코드를 추가합니다.
+
+```diff
+  import '../styles/globals.css'
++ import Amplify from "aws-amplify";
++ import config from "../src/aws-exports";
++ Amplify.configure(config);
+
+  function MyApp({ Component, pageProps }) {
+    return <Component {...pageProps} />
+  }
+
+  export default MyApp
+```
+
+위 코드가 추가되면, app 에서 AWS service 를 이용할 준비가 됩니다.
+
+## Adding Authentication
+
+다음과정은, authentication을 추가를 해보겠습니다.
+
+authentication 추가를 위해, 다음 명령어를 실행합니다.
+
+```sh
+$ amplify add auth
+
+? Do you want to use default authentication and security configuration? Default configuration
+? How do you want users to be able to sign in when using your Cognito User Pool? Username
+? Do you want to configure advanced settings? No, I am done.
+```
+
+authentication 적용을 위해 `amplify push` 명령어를 실행합니다.
+
+```sh
+$ amplify push
+
+? Are you sure you want to continue? Yes
+```
+
+### withAuthenticator 를 이용하여 로그인된 사용자만 접근 가능한 페이지 구현
+
+인증/로그인된 사용자들만 접근할수 있는 페이지에 `withAuthenticator` HOC (Higher Order Component) 를 적용하면 됩니다.
+
+예를들어, **/pages/index.js** 페이지에 withAuthenticator 를 적용하면, 사용자는 반드시 로그인을 해야합니다. 로그인이 되어있지 않다면, 로그인 페이지로 이동하게 됩니다.
+
+테스트를 위해 **/pages/index.js** 를 변경해봅시다.
+
+```diff
+/* pages/index.js */
+import Head from "next/head";
++ import { withAuthenticator } from "@aws-amplify/ui-react";
+
+- export default Home;
++ export default withAuthenticator(Home);
+```
+
+> Authenticator UI Component 관련 문서 [here](https://docs.amplify.aws/ui/auth/authenticator/q/framework/react)
+
+코드를 변경했으면 브라우져에서 테스트 해봅시다.
+
+```sh
+yarn start
+```
+
+로그인 프롬프트가 뜨는 것으로, Authentication 플로우가 app 에 추가된것을 확인할 수 있습니다.
+
+일단, sign up 계정생성을 해봅시다.
+
+계정 생성을 하면 입력한 이메일로 confirmation code 가 전송됩니다.
+
+이메일로 받은 confirmation code 를 입력해서 계정 생성을 마무리 합니다.
+
+auth console 로 들어가면 생성된 사용자를 확인할수 있습니다.
+
+```sh
+$ amplify console auth
+
+> Choose User Pool
+```
+
+### Signout
+
+Signout 기능을 Signout UI Compnonent 를 이용해 추가해봅시다.
+
+```js
+import { withAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
+
+/* UI 어딘가에 넣어주세요. */
+<AmplifySignOut />;
+```
+
+> Sign Out UI Component 문서 [here](https://docs.amplify.aws/ui/auth/sign-out/q/framework/react)
+
+SignOut 버튼을 눌러서 로그아웃이 잘 되는지도 확인해보세요.
+
+### Accessing User Data
+
+로그인 상태에서 `Auth.currentAuthenticatedUser()` 로 사용자 정보를 가져올수 있습니다.
+
+**pages/index.js** 파일을 변경해봅시다.
+
+```diff
++ import { useEffect } from "react";
++ import { Auth } from "aws-amplify";
+
+
++ useEffect(() => {
++ checkUser(); // new function call
++ });
+
++async function checkUser() {
++  const user = await Auth.currentAuthenticatedUser();
++  console.log("user: ", user);
++  console.log("user attributes: ", user.attributes);
++}
+```
+
+브라우져 콘솔을 열고 / 페이지를 로딩하면, 콘솔에 로그인된 사용자 정보들과 attributes 들이 출력되는걸 확인할수 있습니다.

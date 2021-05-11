@@ -5,7 +5,7 @@ type PublicPost @model {
   content: String
 }
 
-# 인증된 사용자 본인만 CRUD
+# 로그인된 사용자 본인만 CRUD
 type PrivatePost @model @auth(rules: [{ allow: owner }]) {
   id: ID!
   title: String!
@@ -29,7 +29,7 @@ type PrivatePost @model @auth(rules: [{ allow: owner }]) {
 #  content: String
 #}
 
-# 인증된 사용자 CRUD
+# 로그인된 사용자 CRUD
 # 나머지 모든 사용자 Read
 type Post
   @model
@@ -37,4 +37,20 @@ type Post
   id: ID!
   title: String!
   content: String
+}
+
+# 로그인된 사용자 CRUD
+# editor 로 지정된 사용자는 Read/Update
+type PostWithEditor
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: owner, ownerField: "editors", operations: [update, read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  content: String
+  editors: [String]!
 }

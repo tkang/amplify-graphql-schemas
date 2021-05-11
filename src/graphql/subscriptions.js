@@ -106,3 +106,42 @@ export const onDeletePost = /* GraphQL */ `
     }
   }
 `;
+export const onCreatePostWithEditor = /* GraphQL */ `
+  subscription OnCreatePostWithEditor($owner: String!, $editors: String!) {
+    onCreatePostWithEditor(owner: $owner, editors: $editors) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdatePostWithEditor = /* GraphQL */ `
+  subscription OnUpdatePostWithEditor($owner: String!, $editors: String!) {
+    onUpdatePostWithEditor(owner: $owner, editors: $editors) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeletePostWithEditor = /* GraphQL */ `
+  subscription OnDeletePostWithEditor($owner: String!, $editors: String!) {
+    onDeletePostWithEditor(owner: $owner, editors: $editors) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

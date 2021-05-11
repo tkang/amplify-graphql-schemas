@@ -410,7 +410,7 @@ Use a Cognito user pool configured as a part of this project.
 
 > 클라이언트에서 API 호출시 어떤 인증방식을 사용할 것인지 파리미터로 지정해줘야 합니다. 아래 부분에서 보여드리도록 하겠습니다.
 
-### PublicPost : 모든 사용자가 CRUD 가능한 모델 추가
+## PublicPost : 모든 사용자가 CRUD 가능한 모델
 
 일단 모든 사용자가 CRUD 액세스 할수 있는 모델로 만들어보겠습니다. PublicPost 라고 하겠습니다.
 
@@ -476,9 +476,9 @@ query MyQuery {
 }
 ```
 
-## Private Post : 인증된 사용자 본인만 CRUD 가능한 모델
+## Private Post : 로그인된 사용자 본인만 CRUD 가능한 모델
 
-인증된 사용자만 액세스 할수 있는 API 와 모델인 PrivatePost 을 만들어봅시다.
+로그인된 사용자만 액세스 할수 있는 API 와 모델인 PrivatePost 을 만들어봅시다.
 
 **amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
 
@@ -507,8 +507,8 @@ type PrivatePost @model @auth(rules: [{ allow: owner }]) {
 #}
 ```
 
-- `@auth(rules: [{ allow: owner }])` directive 를 추가하면, 모델에 `owner` 필드가 자동으로 추가되며, 해당 필드에는 인증된 사용자의 username 이 저장됩니다.
-- `@auth(rules: [{ allow: owner }])` 의 경우 인증된 사용자만 글을 작성할수 있으며, 인증된 사용자 본인의 글들만 조회하고 업데이트하고 삭제할수 있습니다. [Owner authorization](https://docs.amplify.aws/cli/graphql-transformer/auth#owner-authorization)
+- `@auth(rules: [{ allow: owner }])` directive 를 추가하면, 모델에 `owner` 필드가 자동으로 추가되며, 해당 필드에는 로그인된 사용자의 username 이 저장됩니다.
+- `@auth(rules: [{ allow: owner }])` 의 경우 로그인된 사용자만 글을 작성할수 있으며, 로그인된 사용자 본인의 글들만 조회하고 업데이트하고 삭제할수 있습니다. [Owner authorization](https://docs.amplify.aws/cli/graphql-transformer/auth#owner-authorization)
 
 변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다. `--y` 옵션을 주게되면 cli 에서 나오는 질문들에 모두 자동으로 y 로 답하게 됩니다.
 
@@ -537,7 +537,7 @@ mutation MyMutation {
 }
 ```
 
-> "Select the authorization provider to use for running queries on this page" 에서 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 인증된 사용자만 생성(create) 가능하기 때문입니다.
+> "Select the authorization provider to use for running queries on this page" 에서 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 로그인된 사용자만 생성(create) 가능하기 때문입니다.
 
 PrivatePost 목록을 쿼리해봅니다.
 
@@ -556,11 +556,11 @@ query MyQuery {
 }
 ```
 
-> 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 인증된 사용자만 조회(read) 가능하기 때문입니다.
+> 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 로그인된 사용자만 조회(read) 가능하기 때문입니다.
 
-## Post : 인증된 사용자는 CRUD 가능 + 다른 사용자들 (인증/비인증) 은 Read 가능
+## Post : 로그인된 사용자는 CRUD 가능 + 다른 사용자들 (인증/비인증) 은 Read 가능
 
-인증된 사용자는 생성/수정/삭제/읽기 가능하고, 다른 사용자들은 읽기만 가능한 Post 를 만들어봅시다.
+로그인된 사용자는 생성/수정/삭제/읽기 가능하고, 다른 사용자들은 읽기만 가능한 Post 를 만들어봅시다.
 
 **amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
 
@@ -574,8 +574,8 @@ type Post
 }
 ```
 
-- `allow: public, operations: [read]` 를 `allow: private, operations: [read]` 으로 바꾸면 인증된 사용자들만 글을 읽을수 있게 됩니다. (인증 안된 사용자는 unauthorized error)
-- `allow: owner` 를 `allow: private` 으로 바꾸면, 인증된 사용자들이 글을 수정/삭제 가능하게 됩니다.
+- `allow: public, operations: [read]` ->`allow: private, operations: [read]` 으로 바꾸면 로그인된 사용자들만 글을 읽을수 있게 됩니다. (인증 안된 사용자는 unauthorized error)
+- `allow: owner` 를 `allow: private` 으로 바꾸면, 로그인된 사용자들이 글을 수정/삭제 가능하게 됩니다.
 
 변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
 
@@ -607,7 +607,7 @@ mutation MyMutation {
 }
 ```
 
-> 이번에도 역시 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 나며 레코드 생성에 실패합니다. Post 는 인증된 사용자만 생성(create) 가능하기 때문입니다.
+> 이번에도 역시 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 나며 레코드 생성에 실패합니다. Post 는 로그인된 사용자만 생성(create) 가능하기 때문입니다.
 
 Post 목록을 쿼리해봅니다. 인증방식을 `API Key` 로 변경하고 실행해도 잘 조회되어야 합니다.
 
@@ -621,6 +621,141 @@ query MyQuery {
       owner
       title
       updatedAt
+    }
+  }
+}
+```
+
+## Post with Editor : 로그인된 사용자는 CRUD 가능 + editor 로 지정된 사용자들은 Update/Read 가능
+
+로그인된 사용자는 생성/수정/삭제/읽기 가능하고, editor 로 지정된 사용자들은 update/read 가능한 PostWithEditor 를 만들어봅시다.
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type PostWithEditor
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: owner, ownerField: "editors", operations: [update, read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  content: String
+  editors: [String]!
+}
+```
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
+### Testing API : PostWithEditor
+
+**이번 테스트에는 editor 로 지정할 사용자가 필요합니다.**
+**브라우져로 돌아가 로그아웃한후, 새로운 사용자를 생성해주세요.**
+
+AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 PostWithEditor 를 생성합니다.
+
+인증방식을 `Amazon Cognito User Pools` 로 선택하고 이전 과정에서 생성한 계정으로 로그인해서 인증을 해주세요.
+
+```graphql
+mutation MyMutation {
+  createPostWithEditor(
+    input: {
+      title: "1st Post with Editors"
+      content: "Readable and Updatable by editors"
+      editors: "editor_username_01"
+    }
+  ) {
+    owner
+    editors
+    id
+    createdAt
+    content
+    title
+    updatedAt
+  }
+}
+```
+
+다음과 같은 response 가 옵니다. editors 필드안에는 editor로 지정된 사용자의 username 이 들어있습니다.
+
+```json
+{
+  "data": {
+    "createPostWithEditor": {
+      "owner": "taehokan",
+      "editors": ["editor_username_01"],
+      "id": "be65c470-2ec6-4e3a-a415-79e61e65aeba",
+      "createdAt": "2021-05-11T07:30:00.371Z",
+      "content": "Readable and Updatable by editors",
+      "title": "1st Post with Editors",
+      "updatedAt": "2021-05-11T07:30:00.371Z"
+    }
+  }
+}
+```
+
+editor 로 지정된 사용자인 "editor_username_01" 이 방금 생성된 PostWithEditor 레코드를 Read 와 Update 가능한지 테스트해보겠습니다.
+인증방식은 `Amazon Cognito User Pools` 로 선택하고 이번 섹션에서 새로 생성한 사용자 ("editor_username_01") 로 로그인 인증 해주세요.
+
+PostWithEditor 목록을 쿼리해봅니다.
+
+```graphql
+query MyQuery {
+  listPostWithEditors {
+    items {
+      content
+      createdAt
+      editors
+      id
+      owner
+      title
+      updatedAt
+    }
+  }
+}
+```
+
+조회된 PostWithEditor 를 수정해봅니다.
+
+```graphql
+mutation MyMutation {
+  updatePostWithEditor(
+    input: {
+      id: "be65c470-2ec6-4e3a-a415-79e61e65aeba"
+      content: "Content updated by editor user"
+    }
+  ) {
+    content
+    createdAt
+    editors
+    id
+    owner
+    title
+    updatedAt
+  }
+}
+```
+
+content 의 내용이 변경된것을 확인할수 있습니다.
+
+```json
+{
+  "data": {
+    "updatePostWithEditor": {
+      "content": "Content updated by editor user",
+      "createdAt": "2021-05-11T07:30:00.371Z",
+      "editors": ["editor_username_01"],
+      "id": "be65c470-2ec6-4e3a-a415-79e61e65aeba",
+      "owner": "taehokan",
+      "title": "1st Post with Editors",
+      "updatedAt": "2021-05-11T07:41:08.396Z"
     }
   }
 }

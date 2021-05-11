@@ -92,3 +92,36 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
+export const getPostWithEditor = /* GraphQL */ `
+  query GetPostWithEditor($id: ID!) {
+    getPostWithEditor(id: $id) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const listPostWithEditors = /* GraphQL */ `
+  query ListPostWithEditors(
+    $filter: ModelPostWithEditorFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPostWithEditors(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        content
+        editors
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;

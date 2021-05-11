@@ -133,3 +133,51 @@ export const deletePost = /* GraphQL */ `
     }
   }
 `;
+export const createPostWithEditor = /* GraphQL */ `
+  mutation CreatePostWithEditor(
+    $input: CreatePostWithEditorInput!
+    $condition: ModelPostWithEditorConditionInput
+  ) {
+    createPostWithEditor(input: $input, condition: $condition) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updatePostWithEditor = /* GraphQL */ `
+  mutation UpdatePostWithEditor(
+    $input: UpdatePostWithEditorInput!
+    $condition: ModelPostWithEditorConditionInput
+  ) {
+    updatePostWithEditor(input: $input, condition: $condition) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deletePostWithEditor = /* GraphQL */ `
+  mutation DeletePostWithEditor(
+    $input: DeletePostWithEditorInput!
+    $condition: ModelPostWithEditorConditionInput
+  ) {
+    deletePostWithEditor(input: $input, condition: $condition) {
+      id
+      title
+      content
+      editors
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

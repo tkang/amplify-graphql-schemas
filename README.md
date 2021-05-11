@@ -475,3 +475,85 @@ query MyQuery {
   }
 }
 ```
+
+## Private API Access
+
+인증된 사용자만 액세스 할수 있는 API 와 모델인 PrivatePost 을 만들어봅시다.
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type PrivatePost @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  title: String!
+  content: String
+}
+
+# 위 내용과 동일. @auth directive 를 아래와 같이 풀어서 작성할수 있음.
+# type PrivatePost
+#  @model
+#  @auth(
+#    rules: [
+#      {
+#        allow: owner
+#        ownerField: "owner"
+#        operations: [create, update, delete, read]
+#      }
+#   ]
+#  ) {
+#  id: ID!
+#  title: String!
+#  content: String
+#}
+```
+
+- `@auth(rules: [{ allow: owner }])` directive 를 추가하면, 모델에 `owner` 필드가 자동으로 추가되며, 해당 필드에는 인증된 사용자의 username 이 저장됩니다.
+- `@auth(rules: [{ allow: owner }])` 의 경우 인증된 사용자만 글을 작성할수 있으며, 인증된 사용자 본인의 글들만 조회하고 업데이트하고 삭제할수 있습니다. [Owner authorization](https://docs.amplify.aws/cli/graphql-transformer/auth#owner-authorization)
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다. `--y` 옵션을 주게되면 cli 에서 나오는 질문들에 모두 자동으로 y 로 답하게 됩니다.
+
+```sh
+$ amplify push --y
+```
+
+### Testing API : PrivatePost
+
+AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 PrivatePost을 생성합니다.
+
+"Select the authorization provider to use for running queries on this page" 는 `Amazon Cognito User Pools` 로 선택하고 이전 과정에서 생성한 계정으로 로그인해서 인증을 해주세요.
+
+```graphql
+mutation MyMutation {
+  createPrivatePost(
+    input: { title: "my 1st private post", content: "private content" }
+  ) {
+    createdAt
+    content
+    id
+    owner
+    title
+    updatedAt
+  }
+}
+```
+
+> "Select the authorization provider to use for running queries on this page" 에서 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 인증된 사용자만 생성(create) 가능하기 때문입니다.
+
+PrivatePost 목록을 쿼리해봅니다.
+
+```graphql
+query MyQuery {
+  listPrivatePosts {
+    items {
+      createdAt
+      content
+      id
+      owner
+      title
+      updatedAt
+    }
+  }
+}
+```
+
+> 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 인증된 사용자만 조회(read) 가능하기 때문입니다.

@@ -34,3 +34,39 @@ export const onDeletePublicPost = /* GraphQL */ `
     }
   }
 `;
+export const onCreatePrivatePost = /* GraphQL */ `
+  subscription OnCreatePrivatePost($owner: String!) {
+    onCreatePrivatePost(owner: $owner) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdatePrivatePost = /* GraphQL */ `
+  subscription OnUpdatePrivatePost($owner: String!) {
+    onUpdatePrivatePost(owner: $owner) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeletePrivatePost = /* GraphQL */ `
+  subscription OnDeletePrivatePost($owner: String!) {
+    onDeletePrivatePost(owner: $owner) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

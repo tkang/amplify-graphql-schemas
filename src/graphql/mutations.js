@@ -43,3 +43,48 @@ export const deletePublicPost = /* GraphQL */ `
     }
   }
 `;
+export const createPrivatePost = /* GraphQL */ `
+  mutation CreatePrivatePost(
+    $input: CreatePrivatePostInput!
+    $condition: ModelPrivatePostConditionInput
+  ) {
+    createPrivatePost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updatePrivatePost = /* GraphQL */ `
+  mutation UpdatePrivatePost(
+    $input: UpdatePrivatePostInput!
+    $condition: ModelPrivatePostConditionInput
+  ) {
+    updatePrivatePost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deletePrivatePost = /* GraphQL */ `
+  mutation DeletePrivatePost(
+    $input: DeletePrivatePostInput!
+    $condition: ModelPrivatePostConditionInput
+  ) {
+    deletePrivatePost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

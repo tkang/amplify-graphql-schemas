@@ -30,3 +30,34 @@ export const listPublicPosts = /* GraphQL */ `
     }
   }
 `;
+export const getPrivatePost = /* GraphQL */ `
+  query GetPrivatePost($id: ID!) {
+    getPrivatePost(id: $id) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const listPrivatePosts = /* GraphQL */ `
+  query ListPrivatePosts(
+    $filter: ModelPrivatePostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPrivatePosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        content
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;

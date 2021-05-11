@@ -3,3 +3,26 @@ type PublicPost @model {
   title: String!
   content: String
 }
+
+type PrivatePost @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  title: String!
+  content: String
+}
+
+# 위 내용과 동일. @auth directive 를 아래와 같이 풀어서 작성할수 있음.
+# type PrivatePost
+#  @model
+#  @auth(
+#    rules: [
+#      {
+#        allow: owner
+#        ownerField: "owner"
+#        operations: [create, update, delete, read]
+#      }
+#   ]
+#  ) {
+#  id: ID!
+#  title: String!
+#  content: String
+#}

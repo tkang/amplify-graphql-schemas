@@ -125,3 +125,40 @@ export const listPostWithEditors = /* GraphQL */ `
     }
   }
 `;
+export const getPostWithReaderGroup = /* GraphQL */ `
+  query GetPostWithReaderGroup($id: ID!) {
+    getPostWithReaderGroup(id: $id) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const listPostWithReaderGroups = /* GraphQL */ `
+  query ListPostWithReaderGroups(
+    $filter: ModelPostWithReaderGroupFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPostWithReaderGroups(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        title
+        content
+        readers
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;

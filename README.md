@@ -476,7 +476,7 @@ query MyQuery {
 }
 ```
 
-## Private Post : 로그인된 사용자 본인만 CRUD 가능한 모델
+## Private Post : 로그인된 사용자 본인만 (owner) CRUD 가능한 모델
 
 로그인된 사용자만 액세스 할수 있는 API 와 모델인 PrivatePost 을 만들어봅시다.
 
@@ -558,7 +558,7 @@ query MyQuery {
 
 > 인증방식을 `API Key` 로 선택하고 실행하면, **Unauthorized** 에러가 납니다. PrivatePost 는 로그인된 사용자만 조회(read) 가능하기 때문입니다.
 
-## Post : 로그인된 사용자는 CRUD 가능 + 다른 사용자들 (인증/비인증) 은 Read 가능
+## Post : 로그인된 사용자 본인은(owner) CRUD 가능 + 다른 사용자들 (인증/비인증) 은 Read 가능
 
 로그인된 사용자는 생성/수정/삭제/읽기 가능하고, 다른 사용자들은 읽기만 가능한 Post 를 만들어봅시다.
 
@@ -626,7 +626,7 @@ query MyQuery {
 }
 ```
 
-## Post with Editor : 로그인된 사용자는 CRUD 가능 + editor 로 지정된 사용자들은 Update/Read 가능
+## Post with Editor : 로그인된 사용자 본인은(owner) CRUD 가능 + editor 로 지정된 사용자들은 Update/Read 가능
 
 로그인된 사용자는 생성/수정/삭제/읽기 가능하고, editor 로 지정된 사용자들은 update/read 가능한 PostWithEditor 를 만들어봅시다.
 
@@ -654,10 +654,12 @@ type PostWithEditor
 $ amplify push --y
 ```
 
-### Testing API : PostWithEditor
+### Editor 사용자 생성
 
-**이번 테스트에는 editor 로 지정할 사용자가 필요합니다.**
-**브라우져로 돌아가 로그아웃한후, 새로운 사용자를 생성해주세요.**
+이번 테스트에는 editor 로 지정할 사용자가 필요합니다.
+브라우져로 돌아가 로그아웃한후, 새로운 사용자를 생성해주세요.
+
+### Testing API : PostWithEditor
 
 AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 PostWithEditor 를 생성합니다.
 
@@ -756,6 +758,107 @@ content 의 내용이 변경된것을 확인할수 있습니다.
       "owner": "taehokan",
       "title": "1st Post with Editors",
       "updatedAt": "2021-05-11T07:41:08.396Z"
+    }
+  }
+}
+```
+
+## Post with Reader Group : 로그인된 사용자 본인은(owner) CRUD 가능 + readers 로 지정된 group 은 Read 가능
+
+로그인된 사용자(owner)는 생성/수정/삭제/읽기 가능하고
+readers 로 지정된 group은 Read 가능한 PostWithReaderGroup 를 만들어봅시다.
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type PostWithReaderGroup
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: groups, groupsField: "readers", operations: [read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  content: String
+  readers: [String]!
+}
+```
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
+### Group 에 사용자 추가
+
+이번 테스트에는 사용자를 group 에 추가하는 작업이 필요합니다.
+
+- Ampliy console 로 들어가, "Backend environments" => "Authentication" => "View in Cognito" => "General settings : Users and Groups" => "Groups" => "Create Group" 으로 group 을 생성해주세요. `readergroup` 으로 생성하겠습니다.
+- "General settings : Users and Groups" => "Users" 에서 사용자를 선택후 "Add to group" 으로 사용자를 `readergroup` 그룹에 넣어주세요.
+
+### Testing API : PostWithReaderGroup
+
+AppSync dashboard 에서 **Queries** 를 클릭해서 GraphQL editor 를 열고, 다음 mutation 으로 새로운 PostWithReaderGroup 을 생성합니다.
+
+인증방식을 `Amazon Cognito User Pools` 로 선택하고 이전 과정에서 생성한 계정으로 로그인해서 인증을 해주세요.
+
+```graphql
+mutation MyMutation {
+  createPostWithReaderGroup(
+    input: {
+      title: "1st Post with Reader Group"
+      content: "Readable by reader group"
+      groups: "readergroup"
+    }
+  ) {
+    owner
+    groups
+    id
+    createdAt
+    content
+    title
+    updatedAt
+  }
+}
+```
+
+다음과 같은 response 가 옵니다. editors 필드안에는 editor로 지정된 사용자의 username 이 들어있습니다.
+
+```json
+{
+  "data": {
+    "createPostWithReaderGroup": {
+      "content": "Readable by reader group",
+      "createdAt": "2021-05-11T08:34:35.091Z",
+      "id": "34441463-58f2-48db-8265-af89e9f28b62",
+      "owner": "taehokan",
+      "readers": ["readergroup"],
+      "title": "1st Post with Reader Group",
+      "updatedAt": "2021-05-11T08:34:35.091Z"
+    }
+  }
+}
+```
+
+readergroup 으로 들어가있는 사용자인 `editor_username_01` 로 로그인해서 방금 생성된 레코드를 Read 가능한지 테스트 해봅시다.
+인증방식은 `Amazon Cognito User Pools` 로 선택하고 `editor_username_01` 로 로그인 인증 해주세요.
+
+PostWithReaderGroup 목록을 쿼리해봅니다.
+
+```graphql
+query MyQuery {
+  listPostWithReaderGroups {
+    items {
+      content
+      createdAt
+      id
+      owner
+      readers
+      title
+      updatedAt
     }
   }
 }

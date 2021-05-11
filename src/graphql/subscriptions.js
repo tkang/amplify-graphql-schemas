@@ -145,3 +145,42 @@ export const onDeletePostWithEditor = /* GraphQL */ `
     }
   }
 `;
+export const onCreatePostWithReaderGroup = /* GraphQL */ `
+  subscription OnCreatePostWithReaderGroup($owner: String!) {
+    onCreatePostWithReaderGroup(owner: $owner) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdatePostWithReaderGroup = /* GraphQL */ `
+  subscription OnUpdatePostWithReaderGroup($owner: String!) {
+    onUpdatePostWithReaderGroup(owner: $owner) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeletePostWithReaderGroup = /* GraphQL */ `
+  subscription OnDeletePostWithReaderGroup($owner: String!) {
+    onDeletePostWithReaderGroup(owner: $owner) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

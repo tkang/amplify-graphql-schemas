@@ -181,3 +181,51 @@ export const deletePostWithEditor = /* GraphQL */ `
     }
   }
 `;
+export const createPostWithReaderGroup = /* GraphQL */ `
+  mutation CreatePostWithReaderGroup(
+    $input: CreatePostWithReaderGroupInput!
+    $condition: ModelPostWithReaderGroupConditionInput
+  ) {
+    createPostWithReaderGroup(input: $input, condition: $condition) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updatePostWithReaderGroup = /* GraphQL */ `
+  mutation UpdatePostWithReaderGroup(
+    $input: UpdatePostWithReaderGroupInput!
+    $condition: ModelPostWithReaderGroupConditionInput
+  ) {
+    updatePostWithReaderGroup(input: $input, condition: $condition) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deletePostWithReaderGroup = /* GraphQL */ `
+  mutation DeletePostWithReaderGroup(
+    $input: DeletePostWithReaderGroupInput!
+    $condition: ModelPostWithReaderGroupConditionInput
+  ) {
+    deletePostWithReaderGroup(input: $input, condition: $condition) {
+      id
+      title
+      content
+      readers
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

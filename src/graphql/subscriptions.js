@@ -34,6 +34,69 @@ export const onDeletePublicPost = /* GraphQL */ `
     }
   }
 `;
+export const onCreateMessage = /* GraphQL */ `
+  subscription OnCreateMessage {
+    onCreateMessage {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
+export const onUpdateMessage = /* GraphQL */ `
+  subscription OnUpdateMessage {
+    onUpdateMessage {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
+export const onDeleteMessage = /* GraphQL */ `
+  subscription OnDeleteMessage {
+    onDeleteMessage {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
 export const onCreatePrivatePost = /* GraphQL */ `
   subscription OnCreatePrivatePost($owner: String!) {
     onCreatePrivatePost(owner: $owner) {
@@ -181,6 +244,201 @@ export const onDeletePostWithReaderGroup = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+    }
+  }
+`;
+export const onCreateTopic = /* GraphQL */ `
+  subscription OnCreateTopic {
+    onCreateTopic {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onUpdateTopic = /* GraphQL */ `
+  subscription OnUpdateTopic {
+    onUpdateTopic {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onDeleteTopic = /* GraphQL */ `
+  subscription OnDeleteTopic {
+    onDeleteTopic {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onCreateComment = /* GraphQL */ `
+  subscription OnCreateComment {
+    onCreateComment {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onUpdateComment = /* GraphQL */ `
+  subscription OnUpdateComment {
+    onUpdateComment {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onDeleteComment = /* GraphQL */ `
+  subscription OnDeleteComment {
+    onDeleteComment {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onCreateChannel = /* GraphQL */ `
+  subscription OnCreateChannel {
+    onCreateChannel {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onUpdateChannel = /* GraphQL */ `
+  subscription OnUpdateChannel {
+    onUpdateChannel {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onDeleteChannel = /* GraphQL */ `
+  subscription OnDeleteChannel {
+    onDeleteChannel {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
     }
   }
 `;

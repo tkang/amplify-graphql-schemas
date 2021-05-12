@@ -43,6 +43,78 @@ export const deletePublicPost = /* GraphQL */ `
     }
   }
 `;
+export const createMessage = /* GraphQL */ `
+  mutation CreateMessage(
+    $input: CreateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    createMessage(input: $input, condition: $condition) {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
+export const updateMessage = /* GraphQL */ `
+  mutation UpdateMessage(
+    $input: UpdateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    updateMessage(input: $input, condition: $condition) {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
+export const deleteMessage = /* GraphQL */ `
+  mutation DeleteMessage(
+    $input: DeleteMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    deleteMessage(input: $input, condition: $condition) {
+      id
+      text
+      createdAt
+      channelId
+      updatedAt
+      channel {
+        id
+        name
+        createdAt
+        updatedAt
+        users
+        messages {
+          nextToken
+        }
+      }
+    }
+  }
+`;
 export const createPrivatePost = /* GraphQL */ `
   mutation CreatePrivatePost(
     $input: CreatePrivatePostInput!
@@ -226,6 +298,228 @@ export const deletePostWithReaderGroup = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+    }
+  }
+`;
+export const createTopic = /* GraphQL */ `
+  mutation CreateTopic(
+    $input: CreateTopicInput!
+    $condition: ModelTopicConditionInput
+  ) {
+    createTopic(input: $input, condition: $condition) {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const updateTopic = /* GraphQL */ `
+  mutation UpdateTopic(
+    $input: UpdateTopicInput!
+    $condition: ModelTopicConditionInput
+  ) {
+    updateTopic(input: $input, condition: $condition) {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const deleteTopic = /* GraphQL */ `
+  mutation DeleteTopic(
+    $input: DeleteTopicInput!
+    $condition: ModelTopicConditionInput
+  ) {
+    deleteTopic(input: $input, condition: $condition) {
+      id
+      title
+      createdAt
+      updatedAt
+      owner
+      comments {
+        items {
+          id
+          topicId
+          content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const createComment = /* GraphQL */ `
+  mutation CreateComment(
+    $input: CreateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    createComment(input: $input, condition: $condition) {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const updateComment = /* GraphQL */ `
+  mutation UpdateComment(
+    $input: UpdateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    updateComment(input: $input, condition: $condition) {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const deleteComment = /* GraphQL */ `
+  mutation DeleteComment(
+    $input: DeleteCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    deleteComment(input: $input, condition: $condition) {
+      id
+      topicId
+      content
+      createdAt
+      updatedAt
+      topic {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const updateChannel = /* GraphQL */ `
+  mutation UpdateChannel(
+    $input: UpdateChannelInput!
+    $condition: ModelChannelConditionInput
+  ) {
+    updateChannel(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const deleteChannel = /* GraphQL */ `
+  mutation DeleteChannel(
+    $input: DeleteChannelInput!
+    $condition: ModelChannelConditionInput
+  ) {
+    deleteChannel(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const createChannel = /* GraphQL */ `
+  mutation CreateChannel(
+    $input: CreateChannelInput!
+    $condition: ModelChannelConditionInput
+  ) {
+    createChannel(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+      users
+      messages {
+        items {
+          id
+          text
+          createdAt
+          channelId
+          updatedAt
+        }
+        nextToken
+      }
     }
   }
 `;

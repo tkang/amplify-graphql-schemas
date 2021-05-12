@@ -70,3 +70,84 @@ type PostWithReaderGroup
   content: String
   readers: [String]!
 }
+
+# Post Forum
+# 로그인된 사용자(owner)는 Topic 과 Comment 에 대해 CRUD 가능
+# Moderator group 은 Topic 과 Comment 에 대해 Read/Update/Delete 가능
+# 나머지 로그인 사용자들은 Read 만 가능
+type Topic
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      {
+        allow: groups
+        groups: ["Moderator"]
+        operations: [read, update, delete]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  comments: [Comment] @connection(keyName: "topicComments", fields: ["id"])
+}
+
+type Comment
+  @model
+  @key(name: "topicComments", fields: ["topicId", "content"])
+  @auth(
+    rules: [
+      { allow: owner }
+      {
+        allow: groups
+        groups: ["Moderator"]
+        operations: [read, update, delete]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  topicId: ID!
+  content: String!
+  topic: Topic @connection(fields: ["topicId"])
+}
+
+# Admin group 은 Channel CRUD 가능,
+# 다른 로그인 사용자들은 (1) Channel Read 가능 (2) users 목록 조회 가능
+# users 목록안에 들어있는 사용자들만 Message Create/Read 가능
+type Channel
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["Admin"]
+        operations: [create, update, delete, read]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  name: String!
+  users: [String] @auth(rules: [{ allow: private }])
+  messages: [Message]
+    @connection(
+      name: "channelMessages"
+      keyField: "channelId"
+      sortField: "createdAt"
+    )
+    @auth(
+      rules: [{ allow: owner, ownerField: "users", operations: [create, read] }]
+    )
+}
+
+type Message
+  @model(queries: null)
+  @key(name: "channelMessages", fields: ["channelId", "text"]) {
+  id: ID!
+  text: String!
+  createdAt: AWSDateTime!
+  channelId: ID!
+  channel: Channel @connection(name: "channelMessages", keyField: "channelId")
+}

@@ -1,14 +1,21 @@
 # Common GraphQL Schemas for Amplify application
 
-본 워크샾에서는, [Amplify](https://docs.amplify.aws/), [Next.js](https://nextjs.org/), [GraphQL](https://graphql.org/) 을 이용하여 AWS 위에 full-stack serverless application 을 만들면서 일반적으로 사용되는 GraphQL Schema 를 보여드리려 합니다.
+본 워크샾에서는, [Amplify](https://docs.amplify.aws/) AWS 위에 GraphQL [GraphQL](https://graphql.org/) API 를 구성하다보면 필요한 여러가지 케이스들을 위한 GraphQL Schema 를 보여드리려 합니다.
+
+커버될 시나리오들은 다음과 같습니다.
+
+- Public Post : 모든 사용자 CRUD 가능
+- Private Post : 로그인 사용자만 CRUD 가능
+- Post with editors : Editor 로 지정된 사용자는 Read, Update 가능
+- Post with reader group : Reader 그룹에 들어있는 사용자들은 Read 가능
+- Message Forum with moderators : Topic, Comment 작성가능. Moderator 로 지정된 사용자는 다른 사람의 Topic 과 Comment 도 Read/Update/Delete 가능
+- Chat with Admin : Admin 사용자들만 channel 생성 가능
 
 ### Overview
 
 [Create Next App](https://nextjs.org/docs/api-reference/create-next-app) 을 이용하여 새로운 next.js 프로젝트를 생성합니다. 그리고 [Amplify CLI](https://github.com/aws-amplify/amplify-cli) 를 이용하여 AWS Cloud 환경을 설정하고 [Amplify JS Libraries](https://github.com/aws-amplify/amplify-js) 를 이용하여 우리가 만든 next.js 앱을 AWS Cloud 와 연결해보려 합니다.
 
 본 워크샾은 2~5시간 정도 걸릴것으로 예상됩니다.
-
-[Demo](https://dev.dbraqv3wvmi1j.amplifyapp.com)
 
 ### 개발 환경 Environment
 
@@ -28,10 +35,10 @@ React 와 GraphQL 에대한 지식이 있다면 도움이 되지만, 필수는 �
 
 ### 본 가이드에서 다루어질 토픽들:
 
-- Web application Hosting
-- Authentication
+- Authentication (인증)
 - GraphQL API with AWS AppSync
-- Deleting the resources
+- GraphQL Schema 패턴들
+- Deleting the resources (작업 후 리소스 삭제)
 
 ## 시작하기 - Next Application 생성
 
@@ -99,28 +106,32 @@ Tailwind 의 base, component, utilties 스타일이 사용되도록 next.js 에�
 /* pages/index.js */
 import Head from "next/head";
 
-function Home() {
   return (
     <div>
       <Head>
         <title>Amplify GraphQL Schemas</title>
         <link
           rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍🏢🏬🔍</text></svg>"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>"
         />
       </Head>
 
       <div className="container mx-auto">
-        <main className="flex-col items-center justify-center flex-1">
-          <h1 className="text-6xl">Amplify GraphQL Schemas</h1>
-
-          <p className="text-2xl">Common GraphQL Schemas in Amplify</p>
+        <main className="bg-white">
+          <div className="px-4 py-16 mx-auto max-w-7xl sm:py-24 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="mt-1 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                Amplify GraphQL Schemas
+              </p>
+              <p className="max-w-xl mx-auto mt-5 text-xl text-gray-500">
+                Welcome to Amplify GraphQL Schemas
+              </p>
+            </div>
+          </div>
         </main>
       </div>
 
-      <footer className="flex items-center justify-center h-8 border-t-1">
-        Maintained by ...
-      </footer>
+      <footer></footer>
     </div>
   );
 }
@@ -213,53 +224,10 @@ amplify 프로젝트 상태를 Amplify console 로 확인하고 싶다면, `ampl
 $ amplify console
 ```
 
-## Hosting
+## Configuring the Next applicaion with Amplify
 
-Amplify Console 은 배포와 CI 를 위한 hosting 서비스 입니다.
-
-우선 build 스크립트 변경을 위해 **package.json** 안의 내용중 `scripts` 부분을 다음과 같이 변경해주세요.
-
-```diff
-"scripts": {
-  "dev": "next dev",
--  "build": "next build",
-+  "build": "next build && next export",
-  "start": "next start"
-},
-```
-
-> `next export` 는 next.js app 을 static HTML 파일로 변환해줍니다. 따라서 Node 서버가 필요 없이 app 을 로딩할수 있습니다.
-
-> Amplify hosting 에서는 2021년 4월 현재 static file 만 서빙 가능합니다. 하지만 곧 server-side rendering 을 지원할 예정입니다.
-
-Hosting 을 추가하기 위해, 다음 명령어를 실행합니다.
-
-```sh
-$ amplify add hosting
-
-? Select the plugin module to execute: Hosting with Amplify Console (Managed hosting with custom domains, Continuous deployment)
-? Choose a type: Manual deployment
-```
-
-`amplify push` 명령어로 변경사항 (`add hosting`) 을 적용해봅니다.
-
-```sh
-$ amplify push
-```
-
-`amplify publish` 명령어로 hosting 으로 배포를 해봅니다.
-
-```sh
-$ amplify publish
-```
-
-배포가 완료되면, 브라우져에서 터미널에 출력된 url 로 들어가보셔서 next.js 앱이 정상적으로 로딩되는 것을 확인해주세요.
-
-### Configuring the React applicaion
-
-API 가 생성되고 준비되었으니, app 을 통해 테스트 해봅시다.
-
-우선 해야할일은, 우리가 만들고 있는 app 에서 Amplify project 에 대해 인식하도록 설정하는 것입니다. src 폴더 안에 자동생성된 `aws-exports.js` 파일을 참조하도록 추가해봅시다.
+Amplify 프로젝트가 초기화 되었으니 우리가 만들고 있는 app 에서 Amplify project 에 대해 인식하도록 설정해봅시다.
+src 폴더 안에 자동생성된 `aws-exports.js` 파일을 참조하도록 추가해봅시다.
 
 설정을 하기위해 **pages/\_app.js** 파일을 열고, 다음 코드를 추가합니다.
 
@@ -278,11 +246,11 @@ API 가 생성되고 준비되었으니, app 을 통해 테스트 해봅시다.
 
 위 코드가 추가되면, app 에서 AWS service 를 이용할 준비가 됩니다.
 
-## Adding Authentication
+## 인증 기능 추가 Adding Authentication
 
-다음과정은, authentication을 추가를 해보겠습니다.
+다음과정은, 인증기능을 (Authentication) 추가를 해보겠습니다.
 
-authentication 추가를 위해, 다음 명령어를 실행합니다.
+Authentication 추가를 위해, 다음 명령어를 실행합니다.
 
 ```sh
 $ amplify add auth
@@ -657,7 +625,7 @@ $ amplify push --y
 ### Editor 사용자 생성
 
 이번 테스트에는 editor 로 지정할 사용자가 필요합니다.
-브라우져로 돌아가 로그아웃한후, 새로운 사용자를 생성해주세요.
+브라우져로 돌아가 로그아웃한후, 새로운 사용자를 생성해주세요. `username_01` 로 생성하도록 해봅시다.
 
 ### Testing API : PostWithEditor
 
@@ -671,7 +639,7 @@ mutation MyMutation {
     input: {
       title: "1st Post with Editors"
       content: "Readable and Updatable by editors"
-      editors: "editor_username_01"
+      editors: "username_01"
     }
   ) {
     owner
@@ -692,7 +660,7 @@ mutation MyMutation {
   "data": {
     "createPostWithEditor": {
       "owner": "taehokan",
-      "editors": ["editor_username_01"],
+      "editors": ["username_01"],
       "id": "be65c470-2ec6-4e3a-a415-79e61e65aeba",
       "createdAt": "2021-05-11T07:30:00.371Z",
       "content": "Readable and Updatable by editors",
@@ -703,8 +671,8 @@ mutation MyMutation {
 }
 ```
 
-editor 로 지정된 사용자인 "editor_username_01" 이 방금 생성된 PostWithEditor 레코드를 Read 와 Update 가능한지 테스트해보겠습니다.
-인증방식은 `Amazon Cognito User Pools` 로 선택하고 이번 섹션에서 새로 생성한 사용자 ("editor_username_01") 로 로그인 인증 해주세요.
+editor 로 지정된 사용자인 "username_01" 이 방금 생성된 PostWithEditor 레코드를 Read 와 Update 가능한지 테스트해보겠습니다.
+인증방식은 `Amazon Cognito User Pools` 로 선택하고 이번 섹션에서 새로 생성한 사용자 ("username_01") 로 로그인 인증 해주세요.
 
 PostWithEditor 목록을 쿼리해봅니다.
 
@@ -753,7 +721,7 @@ content 의 내용이 변경된것을 확인할수 있습니다.
     "updatePostWithEditor": {
       "content": "Content updated by editor user",
       "createdAt": "2021-05-11T07:30:00.371Z",
-      "editors": ["editor_username_01"],
+      "editors": ["username_01"],
       "id": "be65c470-2ec6-4e3a-a415-79e61e65aeba",
       "owner": "taehokan",
       "title": "1st Post with Editors",
@@ -843,8 +811,8 @@ mutation MyMutation {
 }
 ```
 
-readergroup 으로 들어가있는 사용자인 `editor_username_01` 로 로그인해서 방금 생성된 레코드를 Read 가능한지 테스트 해봅시다.
-인증방식은 `Amazon Cognito User Pools` 로 선택하고 `editor_username_01` 로 로그인 인증 해주세요.
+readergroup 으로 들어가있는 사용자인 `username_01` 로 로그인해서 방금 생성된 레코드를 Read 가능한지 테스트 해봅시다.
+인증방식은 `Amazon Cognito User Pools` 로 선택하고 `username_01` 로 로그인 인증 해주세요.
 
 PostWithReaderGroup 목록을 쿼리해봅니다.
 
@@ -862,4 +830,136 @@ query MyQuery {
     }
   }
 }
+```
+
+## Message Forum
+
+- 로그인된 사용자 (owner) 는 Topic 과 Comment CRUD 가능
+- Moderator group 은 Topic 과 Comment Read/Update/Delete 가능
+- 나머지 로그인 사용자들은 Topic 과 Comment Read 가능
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type Topic
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      {
+        allow: groups
+        groups: ["Moderator"]
+        operations: [read, update, delete]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  comments: [Comment] @connection(keyName: "topicComments", fields: ["id"])
+}
+
+type Comment
+  @model
+  @key(name: "topicComments", fields: ["topicId", "content"])
+  @auth(
+    rules: [
+      { allow: owner }
+      {
+        allow: groups
+        groups: ["Moderator"]
+        operations: [read, update, delete]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  topicId: ID!
+  content: String!
+  topic: Topic @connection(fields: ["topicId"])
+}
+```
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
+위 schema 를 이용해 구현한 Message Forum application 에 대한 hands-on lab 은 [Build a Reddit-like Forum with Next.js and Amplify](https://github.com/tkang/amplify-forum) 에서 확인 가능합니다.
+
+## Chat
+
+- Admin group 은 Channel CRUD 가능,
+- 다른 로그인 사용자들은 (1) Channel Read 가능 (2) users 목록 조회 가능
+- users 목록안에 들어있는 사용자들만 Message Create/Read 가능
+
+**amplify/backend/api/petstagram/schema.graphql** 파일을 열어 다음 내용을 추가해줍니다.
+
+```graphql
+type Channel
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["Admin"]
+        operations: [create, update, delete, read]
+      }
+      { allow: private, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  name: String!
+  users: [String] @auth(rules: [{ allow: private }])
+  messages: [Message]
+    @connection(
+      name: "channelMessages"
+      keyField: "channelId"
+      sortField: "createdAt"
+    )
+    @auth(
+      rules: [{ allow: owner, ownerField: "users", operations: [create, read] }]
+    )
+}
+
+type Message
+  @model(queries: null)
+  @key(name: "channelMessages", fields: ["channelId", "text"]) {
+  id: ID!
+  text: String!
+  createdAt: AWSDateTime!
+  channelId: ID!
+  channel: Channel @connection(name: "channelMessages", keyField: "channelId")
+}
+```
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
+## Removing Services
+
+만약에 프로젝트와 어카운트에서 서비스를 삭제하고 싶으면 `amplify remove` 명령어로 수행할수 있습니다.
+
+```sh
+$ amplify remove auth
+
+$ amplify push
+```
+
+어떤 서비스가 enabled 되어있는지 모르겠으면 `amplify status` 로 확인할수 있습니다.
+
+```sh
+$ amplify status
+```
+
+### Deleting the Amplify project and all services
+
+프로젝트를 모두 지우고 싶다면 `amplify delete` 명령어로 할수 있습니다.
+
+```sh
+$ amplify delete
 ```

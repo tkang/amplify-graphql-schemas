@@ -162,27 +162,6 @@ export const listPostWithReaderGroups = /* GraphQL */ `
     }
   }
 `;
-export const listTopics = /* GraphQL */ `
-  query ListTopics(
-    $filter: ModelTopicFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listTopics(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        title
-        createdAt
-        updatedAt
-        owner
-        comments {
-          nextToken
-        }
-      }
-      nextToken
-    }
-  }
-`;
 export const getTopic = /* GraphQL */ `
   query GetTopic($id: ID!) {
     getTopic(id: $id) {
@@ -202,6 +181,27 @@ export const getTopic = /* GraphQL */ `
         }
         nextToken
       }
+    }
+  }
+`;
+export const listTopics = /* GraphQL */ `
+  query ListTopics(
+    $filter: ModelTopicFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTopics(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+      }
+      nextToken
     }
   }
 `;
@@ -290,6 +290,41 @@ export const listChannels = /* GraphQL */ `
         messages {
           nextToken
         }
+      }
+      nextToken
+    }
+  }
+`;
+export const getImage = /* GraphQL */ `
+  query GetImage($id: ID!) {
+    getImage(id: $id) {
+      id
+      title
+      customers
+      createdAt
+      updatedAt
+      owner
+      imageUrl
+      thumbnailUrl
+    }
+  }
+`;
+export const listImages = /* GraphQL */ `
+  query ListImages(
+    $filter: ModelImageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listImages(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        customers
+        createdAt
+        updatedAt
+        owner
+        imageUrl
+        thumbnailUrl
       }
       nextToken
     }

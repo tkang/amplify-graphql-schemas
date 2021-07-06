@@ -523,3 +523,54 @@ export const createChannel = /* GraphQL */ `
     }
   }
 `;
+export const createImage = /* GraphQL */ `
+  mutation CreateImage(
+    $input: CreateImageInput!
+    $condition: ModelImageConditionInput
+  ) {
+    createImage(input: $input, condition: $condition) {
+      id
+      title
+      customers
+      createdAt
+      updatedAt
+      owner
+      imageUrl
+      thumbnailUrl
+    }
+  }
+`;
+export const updateImage = /* GraphQL */ `
+  mutation UpdateImage(
+    $input: UpdateImageInput!
+    $condition: ModelImageConditionInput
+  ) {
+    updateImage(input: $input, condition: $condition) {
+      id
+      title
+      customers
+      createdAt
+      updatedAt
+      owner
+      imageUrl
+      thumbnailUrl
+    }
+  }
+`;
+export const deleteImage = /* GraphQL */ `
+  mutation DeleteImage(
+    $input: DeleteImageInput!
+    $condition: ModelImageConditionInput
+  ) {
+    deleteImage(input: $input, condition: $condition) {
+      id
+      title
+      customers
+      createdAt
+      updatedAt
+      owner
+      imageUrl
+      thumbnailUrl
+    }
+  }
+`;

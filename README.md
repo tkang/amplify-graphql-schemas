@@ -893,6 +893,61 @@ type Message
 $ amplify push --y
 ```
 
+## Image Sharing
+
+- 로그인된 사용자는 Image 레코드 생성 가능.
+- 로그인안된 사용자는 Image Read 가능
+- imageUrl 필드의 경우, customers 필드내 그룹 사용자만 Read 가능; iam 권한이 있는 경우 Read 가능
+- thumbnailUrl 필드 : customers 필드내 그룹 사용자만 Read 가능; iam 권한이 있는 경우 Update 가능
+
+registered users can upload images that are only visible to their customers. While the title or number of uploaded images should be visible to all, only paying customers can actually view the images. Another AWS service, like AWS Lambda or EC2, can read the images and create thumbnails of them.
+
+```graphql
+type Image
+  @model(subscriptions: null)
+  @auth(rules: [{ allow: owner }, { allow: private, operations: [read] }]) {
+  id: ID!
+  title: String!
+  customers: [String]
+  imageUrl: String!
+    @auth(
+      rules: [
+        { allow: owner }
+        { allow: groups, groupsField: "customers", operations: [read] }
+        { allow: private, provider: iam, operations: [read] }
+      ]
+    )
+  thumbnailUrl: String
+    @auth(
+      rules: [
+        { allow: owner }
+        { allow: groups, groupsField: "customers", operations: [read] }
+        { allow: private, provider: iam, operations: [update] }
+      ]
+    )
+}
+```
+
+`amplify update api` 명령어를 이용하여 새로운 authorization 방식인 `iam` 을 추가해줍니다.
+
+```sh
+$ amplify update api
+
+? Please select from one of the below mentioned services: GraphQL
+? Select from the options below Update auth settings
+? Choose the default authorization type for the API API key
+? Enter a description for the API key:
+? After how many days from now the API key should expire (1-365): 365
+? Configure additional auth types? Yes
+? Choose the additional authorization types you want to configure for the API Amazon Cognito User Pool, IAM
+```
+
+변경 사항 적용을 위해 `amplify push --y` 명령어를 실행합니다.
+
+```sh
+$ amplify push --y
+```
+
 ## Removing Services
 
 만약에 프로젝트와 어카운트에서 서비스를 삭제하고 싶으면 `amplify remove` 명령어로 수행할수 있습니다.

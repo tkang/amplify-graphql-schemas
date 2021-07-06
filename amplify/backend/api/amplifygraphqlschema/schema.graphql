@@ -151,3 +151,27 @@ type Message
   channelId: ID!
   channel: Channel @connection(name: "channelMessages", keyField: "channelId")
 }
+
+type Image
+  @model(subscriptions: null)
+  @auth(rules: [{ allow: owner }, { allow: private, operations: [read] }]) {
+  id: ID!
+  title: String!
+  customers: [String]
+  imageUrl: String!
+    @auth(
+      rules: [
+        { allow: owner }
+        { allow: groups, groupsField: "customers", operations: [read] }
+        { allow: private, provider: iam, operations: [read] }
+      ]
+    )
+  thumbnailUrl: String
+    @auth(
+      rules: [
+        { allow: owner }
+        { allow: groups, groupsField: "customers", operations: [read] }
+        { allow: private, provider: iam, operations: [update] }
+      ]
+    )
+}

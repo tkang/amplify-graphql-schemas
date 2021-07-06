@@ -1,11 +1,5 @@
 {
-  "hosting": {
-    "amplifyhosting": {
-      "service": "amplifyhosting",
-      "providerPlugin": "awscloudformation",
-      "type": "manual"
-    }
-  },
+  "hosting": {},
   "auth": {
     "amplifygraphqlschemaad4afd12": {
       "service": "Cognito",
@@ -33,6 +27,9 @@
               "userPoolConfig": {
                 "userPoolId": "authamplifygraphqlschemaad4afd12"
               }
+            },
+            {
+              "authenticationType": "AWS_IAM"
             }
           ]
         }
